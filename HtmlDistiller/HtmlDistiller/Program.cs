@@ -32,6 +32,7 @@ using System;
 using System.IO;
 
 using BuildTools.IO;
+using BuildTools.HtmlDistiller.Filters;
 
 namespace BuildTools.HtmlDistiller
 {
@@ -71,7 +72,8 @@ namespace BuildTools.HtmlDistiller
 			FileUtility.PrepSavePath(outputFile);
 
 			string source = File.ReadAllText(inputFile);
-			string output = HtmlDistiller.Parse(source);
+			HtmlDistiller distiller = new HtmlDistiller(source, new ExampleHtmlFilter(48));
+			string output = distiller.Parse();
 
 			File.WriteAllText(outputFile, output, System.Text.Encoding.UTF8);
 		}

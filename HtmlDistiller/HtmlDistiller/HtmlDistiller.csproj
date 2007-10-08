@@ -40,6 +40,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="FileUtility.cs" />
+    <Compile Include="HtmlDistiller\ExampleHtmlFilter.cs" />
     <Compile Include="HtmlDistiller\HtmlDistiller.cs" />
     <Compile Include="HtmlDistiller\HtmlFilter.cs" />
     <Compile Include="HtmlDistiller\HtmlTag.cs" />
