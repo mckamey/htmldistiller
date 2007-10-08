@@ -44,7 +44,7 @@ namespace BuildTools.HtmlDistiller
 		private const string Help =
 			"Processes HTML using various filter levels.\r\n\r\n"+
 			"Usage:\r\n"+
-			"\tHtmlDistiller.exe fileOut fileIn";
+			"\tHtmlDistiller.exe fileIn fileOut";
 
 		#endregion Constants
 
