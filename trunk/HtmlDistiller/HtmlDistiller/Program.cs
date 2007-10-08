@@ -91,11 +91,12 @@ namespace BuildTools.HtmlDistiller
 			// make sure path exists and destination is not readonly
 			FileUtility.PrepSavePath(outputFile);
 
-			HtmlDistiller distiller = new HtmlDistiller(source);
-			distiller.HtmlFilter = new ExampleHtmlFilter(96);
+			HtmlDistiller distiller = new HtmlDistiller();
+			distiller.Source = source;
 			distiller.MaxLength = 20480;
+			distiller.HtmlFilter = new ExampleHtmlFilter(96);
 			distiller.NormalizeWhitespace = true;
-			string output = distiller.Parse();
+			string output = distiller.Output;
 			HtmlTagBoxType boxType = distiller.MaxBoxType;
 
 			File.WriteAllText(outputFile, output, System.Text.Encoding.UTF8);
