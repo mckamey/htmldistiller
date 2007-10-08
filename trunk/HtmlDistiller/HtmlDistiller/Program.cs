@@ -30,6 +30,7 @@
 
 using System;
 using System.IO;
+using System.Net;
 
 using BuildTools.IO;
 using BuildTools.HtmlDistiller.Filters;
@@ -51,29 +52,51 @@ namespace BuildTools.HtmlDistiller
 
 		static void Main(string[] args)
 		{
-			// less than 2 files doesn't make sense
-			if (args.Length < 2)
+			// less than 1 path show help
+			if (args.Length < 1)
 			{
 				Console.Error.WriteLine(Help);
 				Environment.Exit(1);
 			}
 
-			string outputFile = args[0];
-			string inputFile = args[1];
+			string source;
+			string inputFile = args[0];
+			string outputFile = args.Length > 1 ? args[1] : "Output.html";
 
-			// check the input file before start
-			if (!File.Exists(inputFile))
+			if (inputFile != null && inputFile.StartsWith("http://"))
 			{
-				Console.Error.WriteLine("File does not exist: "+inputFile);
-				Environment.Exit(2);
+				WebClient client = new WebClient();
+				try
+				{
+					source = client.DownloadString(inputFile);
+				}
+				catch (Exception ex)
+				{
+					Console.Error.WriteLine(ex.Message);
+					Environment.Exit(2);
+					return;
+				}
+			}
+			else
+			{
+				// check the input file before start
+				if (!File.Exists(inputFile))
+				{
+					Console.Error.WriteLine("File does not exist: "+inputFile);
+					Environment.Exit(2);
+				}
+				source = File.ReadAllText(inputFile);
 			}
 
 			// make sure path exists and destination is not readonly
 			FileUtility.PrepSavePath(outputFile);
 
-			string source = File.ReadAllText(inputFile);
-			HtmlDistiller distiller = new HtmlDistiller(source, new ExampleHtmlFilter(48));
+			HtmlDistiller distiller = new HtmlDistiller(source);
+			distiller.HtmlFilter = new ExampleHtmlFilter(96);
+			distiller.MaxLength = 20480;
+			distiller.NormalizeWhitespace = true;
 			string output = distiller.Parse();
+			TagBoxType boxType = distiller.MaxBoxType;
 
 			File.WriteAllText(outputFile, output, System.Text.Encoding.UTF8);
 		}
