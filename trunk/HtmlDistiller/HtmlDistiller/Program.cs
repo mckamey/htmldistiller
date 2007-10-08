@@ -96,7 +96,7 @@ namespace BuildTools.HtmlDistiller
 			distiller.MaxLength = 20480;
 			distiller.NormalizeWhitespace = true;
 			string output = distiller.Parse();
-			TagBoxType boxType = distiller.MaxBoxType;
+			HtmlTagBoxType boxType = distiller.MaxBoxType;
 
 			File.WriteAllText(outputFile, output, System.Text.Encoding.UTF8);
 		}
