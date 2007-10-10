@@ -97,7 +97,7 @@ namespace BuildTools.HtmlDistiller
 			distiller.HtmlFilter = new ExampleHtmlFilter(96);
 			distiller.NormalizeWhitespace = true;
 			string output = distiller.Output;
-			HtmlModuleType moduleTypes = distiller.ModuleTypes;
+			HtmlTaxonomy moduleTypes = distiller.Taxonomy;
 
 			File.WriteAllText(outputFile, output, System.Text.Encoding.UTF8);
 		}
