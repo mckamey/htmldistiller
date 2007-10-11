@@ -140,7 +140,7 @@ namespace BuildTools.HtmlDistiller
 			}
 			//TODO: add query string encoding into path/filename
 
-			return builder.ToString();
+			return builder.Replace(':', '_').ToString();
 		}
 
 		#endregion Methods
