@@ -22,7 +22,7 @@ namespace BuildTools.HtmlDistiller
 
 		#region Fields
 
-		private readonly Dictionary<string, bool> UnknownTags = new Dictionary<string, bool>();
+		private readonly Dictionary<string, bool> UnknownTags = new Dictionary<string, bool>(100, StringComparer.InvariantCultureIgnoreCase);
 		private readonly Dictionary<string, string> Cache = new Dictionary<string, string>(100, StringComparer.InvariantCultureIgnoreCase);
 		private readonly HtmlDistiller Parser = new HtmlDistiller();
 		private readonly WebClient Browser = new WebClient();
