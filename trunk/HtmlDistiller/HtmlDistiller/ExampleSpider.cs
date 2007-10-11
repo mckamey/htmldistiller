@@ -149,6 +149,11 @@ namespace BuildTools.HtmlDistiller
 
 		bool IHtmlFilter.FilterTag(HtmlTag tag)
 		{
+			if (tag.Taxonomy == HtmlTaxonomy.Unknown)
+			{
+				File.AppendAllText("_UnknownTags.txt", tag+Environment.NewLine);
+			}
+
 			if (tag.HasAttributes)
 			{
 				string url = null;
