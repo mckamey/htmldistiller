@@ -56,52 +56,49 @@ namespace BuildTools.HtmlDistiller
 
 			while (this.queue.Count > 0)
 			{
-				string url = this.queue.Dequeue();
-				if (!Uri.TryCreate(url, UriKind.Absolute, out this.currentUri))
-				{
-					continue;
-				}
-				string path = this.GetUniquePath(this.currentUri, savePath);
-				FileUtility.PrepSavePath(path);
-
-				if (File.Exists(path) || this.cache.ContainsKey(this.currentUri.AbsoluteUri))
-				{
-					continue;
-				}
-
-				this.cache[this.currentUri.AbsoluteUri] = path;
-
+				string path = null;
 				try
 				{
+					string url = this.queue.Dequeue();
+					if (!Uri.TryCreate(url, UriKind.Absolute, out this.currentUri))
+					{
+						continue;
+					}
+					path = this.GetUniquePath(this.currentUri, savePath);
+					FileUtility.PrepSavePath(path);
+
+					if (this.cache.ContainsKey(this.currentUri.AbsoluteUri))
+					{
+						continue;
+					}
+
+					this.cache[this.currentUri.AbsoluteUri] = path;
+
 					Console.WriteLine(this.currentUri.AbsoluteUri);
 
 					// TODO: use HTTP HEAD to get the Content-Type?
-					this.parser.Source = this.browser.DownloadString(this.currentUri);
+					this.browser.DownloadFile(this.currentUri, path);
 					string contentType = this.browser.ResponseHeaders[HttpResponseHeader.ContentType];
-					if (contentType == null ||
-						contentType.IndexOf("html", StringComparison.InvariantCultureIgnoreCase) < 0)
+					if (contentType != null &&
+						contentType.IndexOf("html", StringComparison.InvariantCultureIgnoreCase) >= 0)
 					{
-						//this.browser.DownloadFile(this.currentUri, path);
-						continue;
-					}
-					else
-					{
-						File.WriteAllText(path, this.parser.Output, Encoding.UTF8);
+						this.parser.Source = File.ReadAllText(path);
+						this.parser.Parse();
 					}
 				}
 				catch (Exception ex)
 				{
 					try
 					{
-						File.WriteAllText(path, ex.ToString(), Encoding.UTF8);
+						string error = this.currentUri+Environment.NewLine+ex+Environment.NewLine+Environment.NewLine;
+						File.AppendAllText("_Errors.txt", error, Encoding.UTF8);
 					}
 					catch
 					{
-						Console.Error.WriteLine(ex.Message);
+						Console.Error.WriteLine(ex);
 					}
 					continue;
 				}
-
 			}
 		}
 
@@ -152,14 +149,21 @@ namespace BuildTools.HtmlDistiller
 				switch (tag.TagName)
 				{
 					case "a":
+					case "link":
 					{
-						url = tag.Attributes["href"];
+						if (tag.Attributes.ContainsKey("href"))
+						{
+							url = tag.Attributes["href"];
+						}
 						break;
 					}
 					case "iframe":
 					case "frame":
 					{
-						url = tag.Attributes["src"];
+						if (tag.Attributes.ContainsKey("src"))
+						{
+							url = tag.Attributes["src"];
+						}
 						break;
 					}
 				}
@@ -172,17 +176,17 @@ namespace BuildTools.HtmlDistiller
 				}
 
 			}
-			return true;
+			return false;
 		}
 
 		bool IHtmlFilter.FilterAttribute(string tag, string attribute, ref string value)
 		{
-			return true;
+			return false;
 		}
 
 		bool IHtmlFilter.FilterStyle(string tag, string style, ref string value)
 		{
-			return true;
+			return false;
 		}
 
 		#endregion
