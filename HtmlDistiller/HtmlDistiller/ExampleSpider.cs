@@ -22,10 +22,11 @@ namespace BuildTools.HtmlDistiller
 
 		#region Fields
 
-		private readonly Dictionary<string, string> cache = new Dictionary<string, string>(100, StringComparer.InvariantCultureIgnoreCase);
-		private readonly HtmlDistiller parser = new HtmlDistiller();
-		private readonly WebClient browser = new WebClient();
-		private readonly Queue<string> queue = new Queue<string>(50);
+		private readonly Dictionary<string, bool> UnknownTags = new Dictionary<string, bool>();
+		private readonly Dictionary<string, string> Cache = new Dictionary<string, string>(100, StringComparer.InvariantCultureIgnoreCase);
+		private readonly HtmlDistiller Parser = new HtmlDistiller();
+		private readonly WebClient Browser = new WebClient();
+		private readonly Queue<string> Queue = new Queue<string>(50);
 		private Uri currentUri = null;
 
 		#endregion Fields
@@ -34,9 +35,9 @@ namespace BuildTools.HtmlDistiller
 
 		public ExampleSpider(string startUri)
 		{
-			this.parser.HtmlFilter = this;
-			this.parser.NormalizeWhitespace = false;
-			this.queue.Enqueue(startUri);
+			this.Parser.HtmlFilter = this;
+			this.Parser.NormalizeWhitespace = false;
+			this.Queue.Enqueue(startUri);
 		}
 
 		#endregion Init
@@ -54,12 +55,12 @@ namespace BuildTools.HtmlDistiller
 				savePath = savePath.TrimEnd(Path.DirectorySeparatorChar);
 			}
 
-			while (this.queue.Count > 0)
+			while (this.Queue.Count > 0)
 			{
 				string path = null, url = null;
 				try
 				{
-					url = this.queue.Dequeue();
+					url = this.Queue.Dequeue();
 					if (!Uri.TryCreate(url, UriKind.Absolute, out this.currentUri))
 					{
 						continue;
@@ -71,11 +72,11 @@ namespace BuildTools.HtmlDistiller
 					}
 
 					path = this.GetUniquePath(this.currentUri, savePath);
-					if (this.cache.ContainsKey(this.currentUri.AbsoluteUri))
+					if (this.Cache.ContainsKey(this.currentUri.AbsoluteUri))
 					{
 						continue;
 					}
-					this.cache[this.currentUri.AbsoluteUri] = path;
+					this.Cache[this.currentUri.AbsoluteUri] = path;
 
 					FileUtility.PrepSavePath(path);
 					if (File.Exists(path))
@@ -86,13 +87,13 @@ namespace BuildTools.HtmlDistiller
 					Console.WriteLine(this.currentUri.AbsoluteUri);
 
 					// TODO: use HTTP HEAD to get the Content-Type?
-					this.browser.DownloadFile(this.currentUri, path);
-					string contentType = this.browser.ResponseHeaders[HttpResponseHeader.ContentType];
+					this.Browser.DownloadFile(this.currentUri, path);
+					string contentType = this.Browser.ResponseHeaders[HttpResponseHeader.ContentType];
 					if (contentType != null &&
 						contentType.IndexOf("html", StringComparison.InvariantCultureIgnoreCase) >= 0)
 					{
-						this.parser.Source = File.ReadAllText(path);
-						this.parser.Parse();
+						this.Parser.Source = File.ReadAllText(path);
+						this.Parser.Parse();
 					}
 				}
 				catch (WebException ex)
@@ -160,8 +161,9 @@ namespace BuildTools.HtmlDistiller
 
 		bool IHtmlFilter.FilterTag(HtmlTag tag)
 		{
-			if (tag.Taxonomy == HtmlTaxonomy.Unknown)
+			if (tag.Taxonomy == HtmlTaxonomy.Unknown && !this.UnknownTags.ContainsKey(tag.TagName))
 			{
+				this.UnknownTags[tag.TagName] = true;
 				File.AppendAllText("_UnknownTags.txt", tag+Environment.NewLine);
 			}
 
@@ -194,7 +196,7 @@ namespace BuildTools.HtmlDistiller
 				if (!String.IsNullOrEmpty(url) && Uri.TryCreate(this.currentUri, url, out uri))
 				{
 					// should put scripts, css and images into another bucket or label by type?
-					this.queue.Enqueue(uri.AbsoluteUri);
+					this.Queue.Enqueue(uri.AbsoluteUri);
 				}
 
 			}
