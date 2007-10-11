@@ -64,6 +64,12 @@ namespace BuildTools.HtmlDistiller
 					{
 						continue;
 					}
+
+					if (!this.currentUri.Scheme.StartsWith("http", StringComparison.InvariantCultureIgnoreCase))
+					{
+						continue;
+					}
+
 					path = this.GetUniquePath(this.currentUri, savePath);
 					FileUtility.PrepSavePath(path);
 
