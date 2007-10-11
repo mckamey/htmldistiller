@@ -56,10 +56,10 @@ namespace BuildTools.HtmlDistiller
 
 			while (this.queue.Count > 0)
 			{
-				string path = null;
+				string path = null, url = null;
 				try
 				{
-					string url = this.queue.Dequeue();
+					url = this.queue.Dequeue();
 					if (!Uri.TryCreate(url, UriKind.Absolute, out this.currentUri))
 					{
 						continue;
@@ -71,14 +71,17 @@ namespace BuildTools.HtmlDistiller
 					}
 
 					path = this.GetUniquePath(this.currentUri, savePath);
-					FileUtility.PrepSavePath(path);
-
 					if (this.cache.ContainsKey(this.currentUri.AbsoluteUri))
 					{
 						continue;
 					}
-
 					this.cache[this.currentUri.AbsoluteUri] = path;
+
+					FileUtility.PrepSavePath(path);
+					if (File.Exists(path))
+					{
+						File.Delete(path);
+					}
 
 					Console.WriteLine(this.currentUri.AbsoluteUri);
 
@@ -91,6 +94,14 @@ namespace BuildTools.HtmlDistiller
 						this.parser.Source = File.ReadAllText(path);
 						this.parser.Parse();
 					}
+				}
+				catch (WebException ex)
+				{
+					Console.Error.WriteLine(ex.Message+"("+this.currentUri+")");
+				}
+				catch (UriFormatException ex)
+				{
+					Console.Error.WriteLine(ex.Message+"("+url+")");
 				}
 				catch (Exception ex)
 				{
