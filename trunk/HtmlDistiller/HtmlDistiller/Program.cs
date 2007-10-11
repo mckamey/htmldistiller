@@ -52,54 +52,70 @@ namespace BuildTools.HtmlDistiller
 
 		static void Main(string[] args)
 		{
-			// less than 1 path show help
-			if (args.Length < 1)
+			//// less than 1 path show help
+			//if (args.Length < 1)
+			//{
+			//    Console.Error.WriteLine(Help);
+			//    Environment.Exit(1);
+			//}
+
+			//string source;
+			//string inputFile = args[0];
+			//string outputFile = args.Length > 1 ? args[1] : "Output.html";
+
+
+			try
 			{
-				Console.Error.WriteLine(Help);
-				Environment.Exit(1);
+				Console.Write("Enter start URL: ");
+				string startUrl = Console.ReadLine();
+				//"http://www.apple.com/";
+				ExampleSpider spider = new ExampleSpider(startUrl);
+				spider.Crawl(null);
 			}
-
-			string source;
-			string inputFile = args[0];
-			string outputFile = args.Length > 1 ? args[1] : "Output.html";
-
-			if (inputFile != null && inputFile.StartsWith("http://"))
+			catch (Exception ex)
 			{
-				WebClient client = new WebClient();
-				try
-				{
-					source = client.DownloadString(inputFile);
-				}
-				catch (Exception ex)
-				{
-					Console.Error.WriteLine(ex.Message);
-					Environment.Exit(2);
-					return;
-				}
+				Console.Error.WriteLine(ex.ToString());
 			}
-			else
-			{
-				// check the input file before start
-				if (!File.Exists(inputFile))
-				{
-					Console.Error.WriteLine("File does not exist: "+inputFile);
-					Environment.Exit(2);
-				}
-				source = File.ReadAllText(inputFile);
-			}
+			Console.WriteLine("Done.");
+			Console.ReadLine();
 
-			// make sure path exists and destination is not readonly
-			FileUtility.PrepSavePath(outputFile);
+			//if (inputFile != null && inputFile.StartsWith("http://"))
+			//{
+			//    WebClient client = new WebClient();
+			//    try
+			//    {
+			//        source = client.DownloadString(inputFile);
+			//    }
+			//    catch (Exception ex)
+			//    {
+			//        Console.Error.WriteLine(ex.Message);
+			//        Environment.Exit(2);
+			//        return;
+			//    }
+			//}
+			//else
+			//{
+			//    // check the input file before start
+			//    if (!File.Exists(inputFile))
+			//    {
+			//        Console.Error.WriteLine("File does not exist: "+inputFile);
+			//        Environment.Exit(2);
+			//    }
+			//    source = File.ReadAllText(inputFile);
+			//}
 
-			HtmlDistiller distiller = new HtmlDistiller();
-			distiller.Source = source;
-			distiller.MaxLength = 20480;
-			distiller.HtmlFilter = new ExampleHtmlFilter(96);
-			distiller.NormalizeWhitespace = true;
-			string output = distiller.Output;
-			HtmlTaxonomy moduleTypes = distiller.Taxonomy;
+			//// make sure path exists and destination is not readonly
+			//FileUtility.PrepSavePath(outputFile);
 
-			File.WriteAllText(outputFile, output, System.Text.Encoding.UTF8);
+			//HtmlDistiller distiller = new HtmlDistiller();
+			//distiller.Source = source;
+			//distiller.MaxLength = 20480;
+			//distiller.HtmlFilter = new ExampleHtmlFilter(96);
+			//distiller.NormalizeWhitespace = true;
+			//string output = distiller.Output;
+			//HtmlTaxonomy moduleTypes = distiller.Taxonomy;
+
+			//File.WriteAllText(outputFile, output, System.Text.Encoding.UTF8);
 		}
 
 		#endregion Program Entry
