@@ -78,7 +78,10 @@ namespace BuildTools.HtmlDistiller
 					}
 					this.Cache[this.currentUri.AbsoluteUri] = path;
 
-					FileUtility.PrepSavePath(path);
+					if (!FileUtility.PrepSavePath(path))
+					{
+						continue;
+					}
 					if (File.Exists(path))
 					{
 						File.Delete(path);
