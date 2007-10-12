@@ -78,13 +78,21 @@ namespace BuildTools.HtmlDistiller
 					}
 					this.Cache[this.currentUri.AbsoluteUri] = path;
 
-					if (!FileUtility.PrepSavePath(path))
+					try
 					{
-						continue;
+						if (!FileUtility.PrepSavePath(path))
+						{
+							continue;
+						}
+						if (File.Exists(path))
+						{
+							File.Delete(path);
+						}
 					}
-					if (File.Exists(path))
+					catch (IOException ex)
 					{
-						File.Delete(path);
+						Console.Error.WriteLine(ex.Message+" ("+this.currentUri+")");
+						continue;
 					}
 
 					Console.WriteLine(this.currentUri.AbsoluteUri);
@@ -101,11 +109,11 @@ namespace BuildTools.HtmlDistiller
 				}
 				catch (WebException ex)
 				{
-					Console.Error.WriteLine(ex.Message+"("+this.currentUri+")");
+					Console.Error.WriteLine(ex.Message+" ("+this.currentUri+")");
 				}
 				catch (UriFormatException ex)
 				{
-					Console.Error.WriteLine(ex.Message+"("+url+")");
+					Console.Error.WriteLine(ex.Message+" ("+url+")");
 				}
 				catch (Exception ex)
 				{
