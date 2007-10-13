@@ -5,6 +5,7 @@ using System.Text;
 using System.Net;
 
 using BuildTools.IO;
+using BuildTools.Collections;
 using BuildTools.HtmlDistiller.Filters;
 
 namespace BuildTools.HtmlDistiller
@@ -22,8 +23,7 @@ namespace BuildTools.HtmlDistiller
 
 		#region Fields
 
-		private readonly Dictionary<string, bool> UnknownTags = new Dictionary<string, bool>(100, StringComparer.InvariantCultureIgnoreCase);
-		private readonly Dictionary<string, string> Cache = new Dictionary<string, string>(100, StringComparer.InvariantCultureIgnoreCase);
+		private readonly StringDictionary<string> Cache = new StringDictionary<string>(false);
 		private readonly HtmlDistiller Parser = new HtmlDistiller();
 		private readonly WebClient Browser = new WebClient();
 		private readonly Queue<string> Queue = new Queue<string>(50);
@@ -172,9 +172,8 @@ namespace BuildTools.HtmlDistiller
 
 		public override bool FilterTag(HtmlTag tag)
 		{
-			if (tag.Taxonomy == HtmlTaxonomy.Unknown && !this.UnknownTags.ContainsKey(tag.TagName))
+			if (tag.Taxonomy == HtmlTaxonomy.Unknown)
 			{
-				this.UnknownTags[tag.TagName] = true;
 				File.AppendAllText("_UnknownTags.txt", tag+Environment.NewLine);
 			}
 
