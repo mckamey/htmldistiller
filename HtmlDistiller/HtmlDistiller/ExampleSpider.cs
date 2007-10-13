@@ -9,7 +9,7 @@ using BuildTools.HtmlDistiller.Filters;
 
 namespace BuildTools.HtmlDistiller
 {
-	public class ExampleSpider : IHtmlFilter
+	public class ExampleSpider : SafeHtmlFilter
 	{
 		#region Constants
 
@@ -33,7 +33,7 @@ namespace BuildTools.HtmlDistiller
 
 		#region Init
 
-		public ExampleSpider(string startUri)
+		public ExampleSpider(string startUri) : base(20)
 		{
 			this.Parser.HtmlFilter = this;
 			this.Parser.NormalizeWhitespace = false;
@@ -170,7 +170,7 @@ namespace BuildTools.HtmlDistiller
 
 		#region IHtmlFilter Members
 
-		bool IHtmlFilter.FilterTag(HtmlTag tag)
+		public override bool FilterTag(HtmlTag tag)
 		{
 			if (tag.Taxonomy == HtmlTaxonomy.Unknown && !this.UnknownTags.ContainsKey(tag.TagName))
 			{
@@ -211,30 +211,6 @@ namespace BuildTools.HtmlDistiller
 				}
 
 			}
-			return false;
-		}
-
-		bool IHtmlFilter.FilterAttribute(string tag, string attribute, ref string value)
-		{
-			return false;
-		}
-
-		bool IHtmlFilter.FilterStyle(string tag, string style, ref string value)
-		{
-			return false;
-		}
-
-		/// <summary>
-		/// 
-		/// </summary>
-		/// <param name="source"></param>
-		/// <param name="start"></param>
-		/// <param name="end"></param>
-		/// <param name="replacement"></param>
-		/// <returns></returns>
-		public virtual bool FilterLiteral(string source, int start, int end, out string replacement)
-		{
-			replacement = null;
 			return false;
 		}
 
