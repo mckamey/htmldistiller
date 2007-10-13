@@ -23,7 +23,7 @@ namespace BuildTools.HtmlDistiller
 
 		#region Fields
 
-		private readonly StringDictionary<string> Cache = new StringDictionary<string>(false);
+		private readonly StringDictionary<bool> Cache = new StringDictionary<bool>(false);
 		private readonly HtmlDistiller Parser = new HtmlDistiller();
 		private readonly WebClient Browser = new WebClient();
 		private readonly Queue<string> Queue = new Queue<string>(50);
@@ -76,7 +76,7 @@ namespace BuildTools.HtmlDistiller
 					{
 						continue;
 					}
-					this.Cache[this.currentUri.AbsoluteUri] = path;
+					this.Cache[this.currentUri.AbsoluteUri] = true;
 
 					try
 					{
