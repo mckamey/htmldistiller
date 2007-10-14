@@ -24,7 +24,7 @@ namespace BuildTools.Collections
 		/// </summary>
 		private const int CharsetStart = 0x20;
 		private const int CharsetEnd = 0x7E;
-		private const int CharsetLength = CharsetEnd-CharsetStart;
+		private const int CharsetLength = CharsetEnd-CharsetStart+1;
 
 		#endregion Constants
 
