@@ -10,10 +10,11 @@ using BuildTools.HtmlDistiller.Filters;
 
 namespace BuildTools.HtmlDistiller
 {
-	public class ExampleSpider : SafeHtmlFilter
+	public class ExampleSpider : SafeHtmlFilter, IDisposable
 	{
 		#region Constants
 
+		private const string QueueFile = "_Queue.txt";
 		private const string DefaultFile = "index.html";
 		private const string PathFormat = @"\{0}";
 		private static readonly char[] HostSplit = new char[] { '.' };
@@ -26,18 +27,28 @@ namespace BuildTools.HtmlDistiller
 		private readonly StringDictionary<bool> Cache = new StringDictionary<bool>(false);
 		private readonly HtmlDistiller Parser = new HtmlDistiller();
 		private readonly WebClient Browser = new WebClient();
-		private readonly Queue<string> Queue = new Queue<string>(50);
 		private Uri currentUri = null;
+		private StreamReader QueueReader = null;
+		private StreamWriter QueueWriter = null;
+		private string domainBound = null;
 
 		#endregion Fields
 
 		#region Init
 
-		public ExampleSpider(string startUri) : base(20)
+		public ExampleSpider(string startUrl, bool onlyWithinDomain) : base(20)
 		{
 			this.Parser.HtmlFilter = this;
-			this.Parser.NormalizeWhitespace = false;
-			this.Queue.Enqueue(startUri);
+			this.Parser.NormalizeWhitespace = true;
+
+			if (Uri.TryCreate(startUrl, UriKind.Absolute, out this.currentUri))
+			{
+				if (onlyWithinDomain)
+				{
+					this.domainBound = this.currentUri.DnsSafeHost;
+				}
+				this.Enqueue(startUrl);
+			}
 		}
 
 		#endregion Init
@@ -55,24 +66,26 @@ namespace BuildTools.HtmlDistiller
 				savePath = savePath.TrimEnd(Path.DirectorySeparatorChar);
 			}
 
-			while (this.Queue.Count > 0)
+			string url = null;
+			while (!String.IsNullOrEmpty(url = this.Dequeue()))
 			{
-				string path = null, url = null;
+				string path = null;
 				try
 				{
-					url = this.Queue.Dequeue();
 					if (!Uri.TryCreate(url, UriKind.Absolute, out this.currentUri))
 					{
 						continue;
 					}
 
-					if (!this.currentUri.Scheme.StartsWith("http", StringComparison.InvariantCultureIgnoreCase))
+					if (this.domainBound != null &&
+						!this.domainBound.Equals(this.currentUri.DnsSafeHost, StringComparison.InvariantCultureIgnoreCase))
 					{
+						// stay within domain
 						continue;
 					}
 
 					path = this.GetUniquePath(this.currentUri, savePath);
-					if (this.Cache.ContainsKey(this.currentUri.AbsoluteUri))
+					if (this.Cache.ContainsKey(this.currentUri.AbsoluteUri))//File.Exists(path))
 					{
 						continue;
 					}
@@ -109,24 +122,16 @@ namespace BuildTools.HtmlDistiller
 				}
 				catch (WebException ex)
 				{
-					Console.Error.WriteLine(ex.Message+" ("+this.currentUri+")");
+					File.AppendAllText("_WebErrors.txt", ex.Message+"\t"+this.currentUri+Environment.NewLine, Encoding.UTF8);
 				}
 				catch (UriFormatException ex)
 				{
-					Console.Error.WriteLine(ex.Message+" ("+url+")");
+					File.AppendAllText("_UrlErrors.txt", ex.Message+"\t"+this.currentUri+Environment.NewLine, Encoding.UTF8);
 				}
 				catch (Exception ex)
 				{
-					try
-					{
-						string error = this.currentUri+Environment.NewLine+ex+Environment.NewLine+Environment.NewLine;
-						File.AppendAllText("_Errors.txt", error, Encoding.UTF8);
-					}
-					catch
-					{
-						Console.Error.WriteLine(ex);
-					}
-					continue;
+					string error = this.currentUri+Environment.NewLine+ex+Environment.NewLine+Environment.NewLine;
+					File.AppendAllText("_Errors.txt", error, Encoding.UTF8);
 				}
 			}
 		}
@@ -166,17 +171,45 @@ namespace BuildTools.HtmlDistiller
 			return builder.Replace(':', '_').ToString();
 		}
 
+		private void Enqueue(string url)
+		{
+			if (url == null || !url.StartsWith("http", StringComparison.InvariantCultureIgnoreCase))
+			{
+				return;
+			}
+
+			if (this.QueueWriter == null)
+			{
+				FileStream enqueueStream = new FileStream(ExampleSpider.QueueFile, FileMode.Create, FileAccess.Write, FileShare.Read);
+				this.QueueWriter = new StreamWriter(enqueueStream, Encoding.ASCII);
+			}
+
+			this.QueueWriter.WriteLine(url);
+			this.QueueWriter.Flush();
+		}
+
+		private string Dequeue()
+		{
+			if (this.QueueReader == null)
+			{
+				FileStream dequeueStream = new FileStream(ExampleSpider.QueueFile, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+				this.QueueReader = new StreamReader(dequeueStream, Encoding.ASCII);
+			}
+
+			if (this.QueueReader.EndOfStream)
+			{
+				return null;
+			}
+
+			return this.QueueReader.ReadLine();
+		}
+
 		#endregion Methods
 
 		#region IHtmlFilter Members
 
 		public override bool FilterTag(HtmlTag tag)
 		{
-			if (tag.Taxonomy == HtmlTaxonomy.Unknown)
-			{
-				File.AppendAllText("_UnknownTags.txt", tag+Environment.NewLine);
-			}
-
 			if (tag.HasAttributes)
 			{
 				string url = null;
@@ -206,11 +239,29 @@ namespace BuildTools.HtmlDistiller
 				if (!String.IsNullOrEmpty(url) && Uri.TryCreate(this.currentUri, url, out uri))
 				{
 					// should put scripts, css and images into another bucket or label by type?
-					this.Queue.Enqueue(uri.AbsoluteUri);
+					this.Enqueue(uri.AbsoluteUri);
 				}
 
 			}
 			return false;
+		}
+
+		#endregion
+
+		#region IDisposable Members
+
+		void IDisposable.Dispose()
+		{
+			if (this.QueueWriter != null)
+			{
+				this.QueueWriter.Dispose();
+				this.QueueWriter = null;
+			}
+			if (this.QueueReader != null)
+			{
+				this.QueueReader.Dispose();
+				this.QueueReader = null;
+			}
 		}
 
 		#endregion

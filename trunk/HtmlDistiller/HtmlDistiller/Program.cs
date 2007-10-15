@@ -47,8 +47,10 @@ namespace BuildTools.HtmlDistiller
 			{
 				Console.Write("Enter start URL: ");
 				string startUrl = Console.ReadLine();
-				ExampleSpider spider = new ExampleSpider(startUrl);
-				spider.Crawl(null);
+				using (ExampleSpider spider = new ExampleSpider(startUrl, true))
+				{
+					spider.Crawl(null);
+				}
 			}
 			catch (Exception ex)
 			{
