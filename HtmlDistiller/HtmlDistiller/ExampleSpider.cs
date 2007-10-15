@@ -17,8 +17,8 @@ namespace BuildTools.HtmlDistiller
 		private const string QueueFile = "_Queue.txt";
 		private const string DefaultFile = "index.html";
 		private const string PathFormat = @"\{0}";
-		private static readonly char[] HostSplit = new char[] { '.' };
-		private static readonly char[] PathSplit = new char[] { '/' };
+		private static readonly char[] HostSplit = new char[] { '.', ':' };
+		private static readonly char[] PathSplit = new char[] { '/', ':' };
 
 		#endregion Constants
 
@@ -91,34 +91,30 @@ namespace BuildTools.HtmlDistiller
 					}
 					this.Cache[this.currentUri.AbsoluteUri] = true;
 
-					try
+					if (!FileUtility.PrepSavePath(path))
 					{
-						if (!FileUtility.PrepSavePath(path))
-						{
-							continue;
-						}
-						if (File.Exists(path))
-						{
-							File.Delete(path);
-						}
-					}
-					catch (IOException ex)
-					{
-						Console.Error.WriteLine(ex.Message+" ("+this.currentUri+")");
 						continue;
 					}
-
-					Console.WriteLine(this.currentUri.AbsoluteUri);
+					if (File.Exists(path))
+					{
+						File.Delete(path);
+					}
 
 					// TODO: use HTTP HEAD to get the Content-Type?
 					this.Browser.DownloadFile(this.currentUri, path);
+
 					string contentType = this.Browser.ResponseHeaders[HttpResponseHeader.ContentType];
 					if (contentType != null &&
 						contentType.IndexOf("html", StringComparison.InvariantCultureIgnoreCase) >= 0)
 					{
+						Console.WriteLine(this.currentUri.AbsoluteUri);
 						this.Parser.Source = File.ReadAllText(path);
 						this.Parser.Parse();
 					}
+				}
+				catch (IOException ex)
+				{
+					File.AppendAllText("_IOErrors.txt", ex.Message+"\t"+this.currentUri+Environment.NewLine, Encoding.UTF8);
 				}
 				catch (WebException ex)
 				{
@@ -162,13 +158,21 @@ namespace BuildTools.HtmlDistiller
 				builder.AppendFormat(PathFormat, parts[i]);
 			}
 
-			if (!uri.IsFile)
+			if (!String.IsNullOrEmpty(uri.Query))
+			{
+				// don't care so much about query strings as open to interpretation
+				// but this will allow multiple to same document
+				builder.AppendFormat(PathFormat, "_QueryHash="+uri.Query.GetHashCode());
+			}
+
+			string temp = builder.ToString();
+			if (temp.LastIndexOf('.') < temp.LastIndexOf(Path.DirectorySeparatorChar))
 			{
 				builder.AppendFormat(PathFormat, DefaultFile);
+				temp = builder.ToString();
 			}
-			//TODO: add query string encoding into path/filename
 
-			return builder.Replace(':', '_').ToString();
+			return temp;
 		}
 
 		private void Enqueue(string url)
