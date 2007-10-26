@@ -108,8 +108,8 @@ namespace BuildTools.HtmlDistiller
 						contentType.IndexOf("html", StringComparison.InvariantCultureIgnoreCase) >= 0)
 					{
 						Console.WriteLine(this.currentUri.AbsoluteUri);
-						this.Parser.Source = File.ReadAllText(path);
-						this.Parser.Parse();
+						string source = File.ReadAllText(path);
+						this.Parser.Parse(source);
 					}
 				}
 				catch (IOException ex)
