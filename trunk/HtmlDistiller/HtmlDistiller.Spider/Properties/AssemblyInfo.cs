@@ -33,7 +33,7 @@ using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
 [assembly: AssemblyTitle("HtmlDistiller")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyDescription("HTML parsing and filtering library")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
 [assembly: AssemblyProduct("BuildTools")]
