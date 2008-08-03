@@ -34,6 +34,7 @@ using System.Net;
 
 using BuildTools.IO;
 using BuildTools.HtmlDistiller.Filters;
+using BuildTools.HtmlDistiller.Writers;
 
 namespace BuildTools.HtmlDistiller
 {
@@ -43,6 +44,18 @@ namespace BuildTools.HtmlDistiller
 
 		static void Main(string[] args)
 		{
+			string template = File.ReadAllText(@"D:\Dev\SMM-VSS\PseudoCode\Dev\BuildTools\HtmlDistiller.Spider\ItemTemplate.jbst");
+			HtmlDistiller parser = new HtmlDistiller(0, new UnsafeHtmlFilter());
+			parser.EncodeNonAscii = false;
+
+			using (HtmlWriter writer = new HtmlWriter(File.OpenWrite(@"D:\Dev\SMM-VSS\PseudoCode\Dev\BuildTools\HtmlDistiller.Spider\Output.jbst")))
+			{
+				parser.HtmlWriter = writer;
+				parser.Parse(template);
+			}
+			string output = File.ReadAllText(@"D:\Dev\SMM-VSS\PseudoCode\Dev\BuildTools\HtmlDistiller.Spider\Output.jbst");
+			return;
+
 			try
 			{
 				Console.Write("Enter start URL: ");

@@ -46,7 +46,7 @@
   <ItemGroup>
     <ProjectReference Include="..\HtmlDistiller\HtmlDistiller.csproj">
       <Project>{294875CA-8B72-47B7-8398-B839E6D09A9B}</Project>
-      <Name>HtmlDistiller</Name>
+      <Name>HtmlDistiller %28HtmlDistiller\HtmlDistiller%29</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
