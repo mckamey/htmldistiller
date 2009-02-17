@@ -1,7 +1,7 @@
 ﻿#region BuildTools License
 /*---------------------------------------------------------------------------------*\
 
-	BuildTools distributed under the terms of an MIT-style license:
+	Distributed under the terms of an MIT-style license:
 
 	The MIT License
 
