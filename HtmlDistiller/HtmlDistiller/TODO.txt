@@ -1,0 +1,34 @@
+Features:
+- Pluggable sets of custom HTML tag/attribute/style filters
+- Optional limit for total length of text (i.e. not tags)
+- Optional whitespace normalization
+- Encodes non-ASCII characters
+
+TODO:
+  - separate parser from writer
+  - add additional writers (specifically JsonML)
+  - respect Robots.txt! doh!
+  - remove everything between certain tags? (e.g. script, style)
+  - replace tag pairs?
+X - enable inline <% %> script parsing
+X - Enable usage in JsonMLTextWriter:
+X - Allow incremental parsing mode? i.e. keep tag stack, state and subsequent calls to parse continue where left off?
+X - Strip Tags/Attributes not in Whitelists
+X - "Configurable" whitelists (e.g. none, simple, secure)
+X - "Strip" mode which converts to plaintext (i.e. empty whitelist)
+X - Optional limit on size of images (height/width)
+X - Limit total number of chars
+X - Normalize line endings (CR/CRLF -> LF)
+X - Limit line endings? no more than 2 LF in a row?
+X - Entity-encode hi order chars (to avoid encoding issues)
+X - Parse style tags and allow filtering of properties
+X - Normalize whitespace (otherwise messes up 2 LF limit)
+X - Image size limit should keep sizes proportional
+X - support !Doctype
+X - support XML declaration <?xml version="1.0" encoding="UTF-8"?>
+X - support <![CDATA[...]> and <!--[if IE]>...<![endif]--> conditional comments
+X - Flag if a tag is (primarily?) plain text
+X - Determine the complexity for parsed markup (plain/inline/block)
+X - LF-to-BR: applied only to non-block elements
+X - make a quick and dirty spider which uses this
+X - literal callbacks? string callback(source, start, end/count);?
