@@ -34,15 +34,13 @@ using System.Runtime.InteropServices;
 
 [assembly: AssemblyTitle("HtmlDistiller")]
 [assembly: AssemblyDescription("HTML parsing and filtering library")]
-[assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("BuildTools")]
+[assembly: AssemblyProduct("JsonFx.NET")]
 [assembly: AssemblyCopyright("Copyright © 2006-2009 Stephen M. McKamey. All rights reserved.")]
-[assembly: AssemblyTrademark("")]
-[assembly: AssemblyCulture("")]
-
-[assembly: ComVisible(false)]
+[assembly: AssemblyCompany("http://jsonfx.net")]
+#if DEBUG
+[assembly: AssemblyConfiguration("Debug")]
+#else
+[assembly: AssemblyConfiguration("Release")]
+#endif
 
 [assembly: Guid("278479A5-CAD5-4836-9476-FFBD1767693D")]
-
-[assembly: AssemblyFileVersion("1.0.0.0")]
