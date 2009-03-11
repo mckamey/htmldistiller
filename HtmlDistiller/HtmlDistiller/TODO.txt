@@ -1,15 +1,17 @@
 Features:
 - Pluggable sets of custom HTML tag/attribute/style filters
-- Optional limit for total length of text (i.e. not tags)
+- Optional limit for total length of textual content (i.e. not tags)
 - Optional whitespace normalization
 - Encodes non-ASCII characters
 
 TODO:
-  - separate parser from writer
+  - create function to auto convert URLs to <a href="url">url</a>
   - add additional writers (specifically JsonML)
-  - respect Robots.txt! doh!
+  - example spider needs to respect Robots.txt!
+  - treat everything between certain tags as single CDATA block? (e.g. script, style)
   - remove everything between certain tags? (e.g. script, style)
   - replace tag pairs?
+x - separate parser from writer
 X - enable inline <% %> script parsing
 X - Enable usage in JsonMLTextWriter:
 X - Allow incremental parsing mode? i.e. keep tag stack, state and subsequent calls to parse continue where left off?
