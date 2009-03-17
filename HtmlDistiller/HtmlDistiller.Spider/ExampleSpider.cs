@@ -37,10 +37,13 @@ using System.Net;
 using JsonFx.BuildTools.IO;
 using JsonFx.BuildTools.Collections;
 using JsonFx.BuildTools.HtmlDistiller.Filters;
+using JsonFx.BuildTools.HtmlDistiller.Writers;
 
 namespace JsonFx.BuildTools.HtmlDistiller
 {
-	public class ExampleSpider : SafeHtmlFilter, IDisposable
+	public class ExampleSpider :
+		IHtmlFilter,
+		IDisposable
 	{
 		#region Constants
 
@@ -66,9 +69,15 @@ namespace JsonFx.BuildTools.HtmlDistiller
 
 		#region Init
 
-		public ExampleSpider(string startUrl, bool onlyWithinDomain) : base(20)
+		/// <summary>
+		/// Ctor
+		/// </summary>
+		/// <param name="startUrl"></param>
+		/// <param name="onlyWithinDomain"></param>
+		public ExampleSpider(string startUrl, bool onlyWithinDomain)
 		{
 			this.Parser.HtmlFilter = this;
+			this.Parser.HtmlWriter = new HtmlWriter(StreamWriter.Null);
 			this.Parser.NormalizeWhitespace = true;
 
 			if (Uri.TryCreate(startUrl, UriKind.Absolute, out this.currentUri))
@@ -85,6 +94,10 @@ namespace JsonFx.BuildTools.HtmlDistiller
 
 		#region Methods
 
+		/// <summary>
+		/// Initiates a recursive walk of the web.
+		/// </summary>
+		/// <param name="savePath"></param>
 		public void Crawl(string savePath)
 		{
 			if (String.IsNullOrEmpty(savePath))
@@ -130,7 +143,7 @@ namespace JsonFx.BuildTools.HtmlDistiller
 						File.Delete(path);
 					}
 
-					// TODO: use HTTP HEAD to get the Content-Type?
+					// TODO: use HTTP HEAD to determine the Content-Type?
 					this.Browser.DownloadFile(this.currentUri, path);
 
 					string contentType = this.Browser.ResponseHeaders[HttpResponseHeader.ContentType];
@@ -215,7 +228,7 @@ namespace JsonFx.BuildTools.HtmlDistiller
 			if (this.QueueWriter == null)
 			{
 				FileStream enqueueStream = new FileStream(ExampleSpider.QueueFile, FileMode.Create, FileAccess.Write, FileShare.Read);
-				this.QueueWriter = new StreamWriter(enqueueStream, Encoding.ASCII);
+				this.QueueWriter = new StreamWriter(enqueueStream, Encoding.UTF8);
 			}
 
 			this.QueueWriter.WriteLine(url);
@@ -227,7 +240,7 @@ namespace JsonFx.BuildTools.HtmlDistiller
 			if (this.QueueReader == null)
 			{
 				FileStream dequeueStream = new FileStream(ExampleSpider.QueueFile, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
-				this.QueueReader = new StreamReader(dequeueStream, Encoding.ASCII);
+				this.QueueReader = new StreamReader(dequeueStream, Encoding.UTF8);
 			}
 
 			if (this.QueueReader.EndOfStream)
@@ -242,7 +255,18 @@ namespace JsonFx.BuildTools.HtmlDistiller
 
 		#region IHtmlFilter Members
 
-		public override bool FilterTag(HtmlTag tag)
+		IHtmlWriter IHtmlFilter.HtmlWriter
+		{
+			get { return null; }
+			set { }
+		}
+
+		/// <summary>
+		/// Gaining access to very specific properties by using an IHtmlFilter interface
+		/// </summary>
+		/// <param name="tag"></param>
+		/// <returns></returns>
+		bool IHtmlFilter.FilterTag(HtmlTag tag)
 		{
 			if (tag.HasAttributes)
 			{
@@ -254,7 +278,7 @@ namespace JsonFx.BuildTools.HtmlDistiller
 					{
 						if (tag.Attributes.ContainsKey("href"))
 						{
-							url = tag.Attributes["href"];
+							url = tag.Attributes["href"] as string;
 						}
 						break;
 					}
@@ -263,7 +287,7 @@ namespace JsonFx.BuildTools.HtmlDistiller
 					{
 						if (tag.Attributes.ContainsKey("src"))
 						{
-							url = tag.Attributes["src"];
+							url = tag.Attributes["src"] as string;
 						}
 						break;
 					}
@@ -272,7 +296,7 @@ namespace JsonFx.BuildTools.HtmlDistiller
 				Uri uri;
 				if (!String.IsNullOrEmpty(url) && Uri.TryCreate(this.currentUri, url, out uri))
 				{
-					// should put scripts, css and images into another bucket or label by type?
+					// TODO: put scripts, css and images into another bucket or label by type?
 					this.Enqueue(uri.AbsoluteUri);
 				}
 
@@ -280,7 +304,23 @@ namespace JsonFx.BuildTools.HtmlDistiller
 			return false;
 		}
 
-		#endregion
+		bool IHtmlFilter.FilterAttribute(string tag, string attribute, ref string value)
+		{
+			return false;
+		}
+
+		bool IHtmlFilter.FilterStyle(string tag, string style, ref string value)
+		{
+			return false;
+		}
+
+		bool IHtmlFilter.FilterLiteral(string source, int start, int end, out string replacement)
+		{
+			replacement = null;
+			return true;
+		}
+
+		#endregion IHtmlFilter Members
 
 		#region IDisposable Members
 
@@ -298,6 +338,6 @@ namespace JsonFx.BuildTools.HtmlDistiller
 			}
 		}
 
-		#endregion
+		#endregion IDisposable Members
 	}
 }
