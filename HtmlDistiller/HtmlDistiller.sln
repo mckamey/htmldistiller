@@ -1,0 +1,26 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 9.00
+# Visual Studio 2005
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HtmlDistiller", "HtmlDistiller\HtmlDistiller.csproj", "{294875CA-8B72-47B7-8398-B839E6D09A9B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HtmlDistiller.Spider", "HtmlDistiller.Spider\HtmlDistiller.Spider.csproj", "{1E2B7D02-0A5D-426A-8269-F132343234CE}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{294875CA-8B72-47B7-8398-B839E6D09A9B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{294875CA-8B72-47B7-8398-B839E6D09A9B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{294875CA-8B72-47B7-8398-B839E6D09A9B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{294875CA-8B72-47B7-8398-B839E6D09A9B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1E2B7D02-0A5D-426A-8269-F132343234CE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1E2B7D02-0A5D-426A-8269-F132343234CE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1E2B7D02-0A5D-426A-8269-F132343234CE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1E2B7D02-0A5D-426A-8269-F132343234CE}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
