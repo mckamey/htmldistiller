@@ -47,6 +47,7 @@ namespace JsonFx.BuildTools.HtmlDistiller
 	{
 		#region Constants
 
+		private const string UserAgent = "HtmlDistiller/1.0.0908.1515";
 		private const string QueueFile = "_Queue.txt";
 		private const string DefaultFile = "index.html";
 		private const string PathFormat = @"\{0}";
@@ -76,6 +77,8 @@ namespace JsonFx.BuildTools.HtmlDistiller
 		/// <param name="onlyWithinDomain"></param>
 		public ExampleSpider(string startUrl, bool onlyWithinDomain)
 		{
+			this.Browser.Headers[HttpRequestHeader.UserAgent] = ExampleSpider.UserAgent;
+
 			this.Parser.HtmlFilter = this;
 			this.Parser.HtmlWriter = new HtmlWriter(StreamWriter.Null);
 			this.Parser.NormalizeWhitespace = true;
@@ -144,6 +147,7 @@ namespace JsonFx.BuildTools.HtmlDistiller
 					}
 
 					// TODO: use HTTP HEAD to determine the Content-Type?
+					this.Browser.Headers[HttpRequestHeader.Referer] = this.currentUri.ToString();
 					this.Browser.DownloadFile(this.currentUri, path);
 
 					string contentType = this.Browser.ResponseHeaders[HttpResponseHeader.ContentType];
