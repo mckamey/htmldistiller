@@ -45,8 +45,17 @@ namespace JsonFx.BuildTools.HtmlDistiller
 		{
 			try
 			{
-				Console.Write("Enter start URL: ");
-				string startUrl = Console.ReadLine();
+				string startUrl;
+				if (args.Length > 0)
+				{
+					startUrl = args[0];
+				}
+				else
+				{
+					Console.Write("Enter start URL: ");
+					startUrl = Console.ReadLine();
+				}
+
 				using (ExampleSpider spider = new ExampleSpider(startUrl, true))
 				{
 					spider.Crawl(null);
@@ -56,8 +65,12 @@ namespace JsonFx.BuildTools.HtmlDistiller
 			{
 				Console.Error.WriteLine(ex.ToString());
 			}
-			Console.WriteLine("Done.");
-			Console.ReadLine();
+
+			if (args.Length <= 0)
+			{
+				Console.WriteLine("Done.");
+				Console.ReadLine();
+			}
 		}
 
 		#endregion Program Entry
