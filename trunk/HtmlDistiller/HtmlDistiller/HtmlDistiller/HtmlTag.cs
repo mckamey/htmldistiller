@@ -213,6 +213,16 @@ namespace JsonFx.BuildTools.HtmlDistiller
 		/// Ctor.
 		/// </summary>
 		/// <param name="name"></param>
+		/// <param name="filter"></param>
+		public HtmlTag(string name)
+			: this(name, null)
+		{
+		}
+
+		/// <summary>
+		/// Ctor.
+		/// </summary>
+		/// <param name="name"></param>
 		public HtmlTag(string name, IHtmlFilter filter)
 		{
 			this.filter = filter;
