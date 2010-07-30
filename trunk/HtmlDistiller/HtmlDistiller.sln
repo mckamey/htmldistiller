@@ -5,6 +5,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HtmlDistiller", "HtmlDistil
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HtmlDistiller.Spider", "HtmlDistiller.Spider\HtmlDistiller.Spider.csproj", "{1E2B7D02-0A5D-426A-8269-F132343234CE}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HtmlDistiller.Example", "HtmlDistiller.Example\HtmlDistiller.Example.csproj", "{5FB7D3A8-2928-4638-A257-252EB0C6E2D0}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -19,6 +21,10 @@ Global
 		{1E2B7D02-0A5D-426A-8269-F132343234CE}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1E2B7D02-0A5D-426A-8269-F132343234CE}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1E2B7D02-0A5D-426A-8269-F132343234CE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5FB7D3A8-2928-4638-A257-252EB0C6E2D0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5FB7D3A8-2928-4638-A257-252EB0C6E2D0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5FB7D3A8-2928-4638-A257-252EB0C6E2D0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5FB7D3A8-2928-4638-A257-252EB0C6E2D0}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
