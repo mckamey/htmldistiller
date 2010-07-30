@@ -30,6 +30,7 @@
 
 using System;
 using System.IO;
+using System.Collections;
 using System.Collections.Generic;
 using System.Text;
 
@@ -103,6 +104,21 @@ namespace JsonFx.BuildTools.HtmlDistiller.Writers
 		#endregion Properties
 
 		#region IHtmlWriter Members
+
+		public virtual void WriteMarkup(IEnumerable values)
+		{
+			foreach (object value in values)
+			{
+				HtmlTag tag = value as HtmlTag;
+				if (tag != null)
+				{
+					this.WriteTag(tag);
+					continue;
+				}
+
+				this.WriteLiteral(Convert.ToString(value));
+			}
+		}
 
 		public virtual void WriteLiteral(string value)
 		{
